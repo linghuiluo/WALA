@@ -203,7 +203,7 @@ public class ClassHierarchy implements IClassHierarchy {
     this(scope, factory, scope.getLanguages(), progressMonitor, map, superClassHandling);
   }
 
-  ClassHierarchy(
+  protected ClassHierarchy(
       AnalysisScope scope,
       ClassLoaderFactory factory,
       Collection<Language> languages,
@@ -306,7 +306,7 @@ public class ClassHierarchy implements IClassHierarchy {
   }
 
   /** Add all classes in a class loader to the hierarchy. */
-  private void addAllClasses(IClassLoader loader, IProgressMonitor progressMonitor)
+  protected void addAllClasses(IClassLoader loader, IProgressMonitor progressMonitor)
       throws CancelCHAConstructionException {
     if (DEBUG) {
       System.err.println(("Add all classes from loader " + loader));
@@ -742,7 +742,7 @@ public class ClassHierarchy implements IClassHierarchy {
   }
 
   /** internal representation of a node in the class hiearachy, representing one java class. */
-  static final class Node {
+  public static final class Node {
 
     private final IClass klass;
 

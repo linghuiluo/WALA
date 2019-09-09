@@ -2533,4 +2533,14 @@ public abstract class SSAPropagationCallGraphBuilder extends PropagationCallGrap
     // return true ? (IPointsToSolver)new PreTransitiveSolver(system,this) : new
     // StandardSolver(system,this);
   }
+
+  @SuppressWarnings("unused")
+  public void adaptIncrements(List<Change> changes) {
+    for(Change c:changes)
+    {
+      
+    }
+  }
+  
+  
 }
