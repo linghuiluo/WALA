@@ -46,3 +46,5 @@ build/
 org.eclipse.buildship.core.prefs
 results
 target/
+
+*.launch
