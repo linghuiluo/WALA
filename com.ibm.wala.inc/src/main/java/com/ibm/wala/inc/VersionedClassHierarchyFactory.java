@@ -6,8 +6,8 @@ import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 
 public class VersionedClassHierarchyFactory extends ClassHierarchyFactory {
 
-	public static VersionedClassHierarchy make(AnalysisScope scope, ClassLoaderFactory factory) {
+  public static VersionedClassHierarchy make(AnalysisScope scope, ClassLoaderFactory factory) {
 
-		return null;
-	}
+    return null;
+  }
 }
