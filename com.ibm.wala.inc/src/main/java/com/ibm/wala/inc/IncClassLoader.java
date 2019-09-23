@@ -19,21 +19,18 @@ import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.TypeName;
 import com.ibm.wala.util.strings.Atom;
 
-public class IncClassLoader implements IClassLoader{
-	
+public class IncClassLoader implements IClassLoader {
+
 	private int version;
-	
-	public IncClassLoader()
-	{
-		this.version = VersionedClassHierarchy.latestVersion +1;
+
+	public IncClassLoader() {
+		this.version = VersionedClassHierarchy.latestVersion + 1;
 	}
-	
-	
-	
-	public int getVersion()
-	{
+
+	public int getVersion() {
 		return this.version;
 	}
+
 	@Override
 	public IClass lookupClass(TypeName className) {
 		// TODO Auto-generated method stub
@@ -115,17 +112,16 @@ public class IncClassLoader implements IClassLoader{
 	@Override
 	public void init(List<Module> modules) throws IOException {
 		// TODO load classes from modules‚
-		
+
 	}
 
 	@Override
 	public void removeAll(Collection<IClass> toRemove) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	public List<Change> getChanges(List<Position> ranges)
-	{
+
+	public List<Change> getChanges(List<Position> ranges) {
 		// TODO return a list of changes based on the ranges
 		return null;
 	}

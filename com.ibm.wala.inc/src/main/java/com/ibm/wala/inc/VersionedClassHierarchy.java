@@ -14,20 +14,19 @@ import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.util.MonitorUtil.IProgressMonitor;
 import com.ibm.wala.util.NullProgressMonitor;
 
-public class VersionedClassHierarchy extends ClassHierarchy{
-	
+public class VersionedClassHierarchy extends ClassHierarchy {
+
 	public static int latestVersion = 0;
-	
+
 	public VersionedClassHierarchy(AnalysisScope scope, ClassLoaderFactory factory, Collection<Language> languages,
 			IProgressMonitor progressMonitor, Map<TypeReference, Node> map,
 			MissingSuperClassHandling superClassHandling) throws ClassHierarchyException, IllegalArgumentException {
 		super(scope, factory, languages, progressMonitor, map, superClassHandling);
-	
+
 	}
-	
-	public void addLatestIncrement(IClassLoader cl) throws CancelCHAConstructionException
-	{
+
+	public void addLatestIncrement(IClassLoader cl) throws CancelCHAConstructionException {
 		this.addAllClasses(cl, new NullProgressMonitor());
 	}
-	
+
 }
