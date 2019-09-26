@@ -71,7 +71,7 @@ public class VersionedClassHierarchyTest {
 
         //
 
-        IncClassLoader incLoader = new IncClassLoader();
+        IncClassLoader incLoader = new IncClassLoader(ClassLoaderReference.Incremental, vcha.getLoader(ClassLoaderReference.Application), vcha);
 
         try {
           incLoader.init(new ArrayList<>(files));

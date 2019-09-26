@@ -37,6 +37,10 @@ public class ClassLoaderReference implements Serializable {
   public static final ClassLoaderReference Application =
       new ClassLoaderReference(Atom.findOrCreateUnicodeAtom("Application"), Java, Extension);
 
+  /** Canonical reference to incremental class loader */
+  public static final ClassLoaderReference Incremental =
+      new ClassLoaderReference(Atom.findOrCreateUnicodeAtom("Incremental"), Java, Application);
+  
   /** A String which identifies this loader */
   private final Atom name;
 

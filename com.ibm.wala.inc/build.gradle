@@ -19,6 +19,10 @@ repositories {
 }
 
 
+sourceSets.test {
+    resources.srcDirs = ["src/test/resources"]
+}
+
 dependencies {
 
 	implementation project(':com.ibm.wala.core')
