@@ -21,7 +21,6 @@ import com.ibm.wala.ipa.cha.CancelCHAConstructionException;
 import com.ibm.wala.properties.WalaProperties;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.util.CancelException;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,15 +29,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.jar.JarFile;
-
-import org.junit.Test;
-
 import magpiebridge.core.AnalysisResult;
 import magpiebridge.core.IProjectService;
 import magpiebridge.core.MagpieServer;
 import magpiebridge.core.ServerAnalysis;
 import magpiebridge.core.ServerConfiguration;
 import magpiebridge.projectservice.java.JavaProjectService;
+import org.junit.Test;
 
 public class VersionedClassHierarchyTest {
 
@@ -49,91 +46,97 @@ public class VersionedClassHierarchyTest {
     String language = "java";
     IProjectService ps = new JavaProjectService();
     magpieServer.addProjectService(language, ps);
-    ServerAnalysis analysis = new ServerAnalysis() {
-      VersionedClassHierarchy vcha;
-      SSAPropagationCallGraphBuilder builder;
-      CallGraph cg;
+    ServerAnalysis analysis =
+        new ServerAnalysis() {
+          VersionedClassHierarchy vcha;
+          SSAPropagationCallGraphBuilder builder;
+          CallGraph cg;
 
-      @Override
-      public String source() {
-        return null;
-      }
-
-      @Override
-      public void analyze(Collection<Module> files, MagpieServer server) {
-
-        //
-
-        // magpieBridge sends the files which changed
-
-        // magpieBridge sends the ranges of changes
-        List<Position> ranges = null;
-
-        //
-
-        IncClassLoader incLoader = new IncClassLoader(ClassLoaderReference.Incremental, vcha.getLoader(ClassLoaderReference.Application), vcha);
-
-        try {
-          incLoader.init(new ArrayList<>(files));
-
-          List<Change> changes = incLoader.getChanges(ranges);
-
-          vcha.addLatestIncrement(incLoader);
-
-          builder.adaptIncrements(changes);
-
-          CallGraph cg = builder.getCallGraph();
-
-          Collection<AnalysisResult> results = Collections.emptyList();
-          server.consume(results, source());
-
-        } catch (CancelCHAConstructionException | IOException e) {
-
-          throw new RuntimeException(e);
-        }
-
-      }
-
-      @Override
-      public void prepare(IProjectService ps) {
-        try {
-          AnalysisScope scope = new JavaSourceAnalysisScope();
-
-          // add standard libraries to scope
-          String[] stdlibs = WalaProperties.getJ2SEJarFiles();
-          for (String stdlib : stdlibs) {
-            scope.addToScope(ClassLoaderReference.Primordial, new JarFile(stdlib));
+          @Override
+          public String source() {
+            return null;
           }
 
-          JavaProjectService javaPs = (JavaProjectService) ps;
+          @Override
+          public void analyze(Collection<Module> files, MagpieServer server) {
 
-          Set<Path> sourcePath = javaPs.getSourcePath();
+            //
 
-          // add the source directory to scope
+            // magpieBridge sends the files which changed
 
-          for (Path path : sourcePath) {
-            scope.addToScope(JavaSourceAnalysisScope.SOURCE, new SourceDirectoryTreeModule(path.toFile()));
+            // magpieBridge sends the ranges of changes
+            List<Position> ranges = null;
+
+            //
+
+            IncClassLoader incLoader =
+                new IncClassLoader(
+                    ClassLoaderReference.Incremental,
+                    vcha.getLoader(ClassLoaderReference.Application),
+                    vcha);
+
+            try {
+              incLoader.init(new ArrayList<>(files));
+
+              List<Change> changes = incLoader.getChanges(ranges);
+
+              vcha.addLatestIncrement(incLoader);
+
+              builder.adaptIncrements(changes);
+
+              CallGraph cg = builder.getCallGraph();
+
+              Collection<AnalysisResult> results = Collections.emptyList();
+              server.consume(results, source());
+
+            } catch (CancelCHAConstructionException | IOException e) {
+
+              throw new RuntimeException(e);
+            }
           }
 
-          ClassLoaderFactory factory = new ECJClassLoaderFactory(scope.getExclusions());
-          vcha = VersionedClassHierarchyFactory.make(scope, factory);
-          AnalysisOptions options = new AnalysisOptions();
-          Iterable<? extends Entrypoint> entrypoints
-              = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope.getApplicationLoader(), vcha);
-          options.setEntrypoints(entrypoints);
-          options.setReflectionOptions(ReflectionOptions.NONE);
-          IAnalysisCacheView cache = new AnalysisCacheImpl(AstIRFactory.makeDefaultFactory());
-          builder = (SSAPropagationCallGraphBuilder) new ZeroCFABuilderFactory().make(options, cache, vcha, scope);
-          builder.makeCallGraph(options);
-          cg = builder.getCallGraph();
-        } catch (IllegalArgumentException | CancelException | IOException e) {
-          throw new RuntimeException(e);
-        }
+          @Override
+          public void prepare(IProjectService ps) {
+            try {
+              AnalysisScope scope = new JavaSourceAnalysisScope();
 
-      }
-    };
+              // add standard libraries to scope
+              String[] stdlibs = WalaProperties.getJ2SEJarFiles();
+              for (String stdlib : stdlibs) {
+                scope.addToScope(ClassLoaderReference.Primordial, new JarFile(stdlib));
+              }
+
+              JavaProjectService javaPs = (JavaProjectService) ps;
+
+              Set<Path> sourcePath = javaPs.getSourcePath();
+
+              // add the source directory to scope
+
+              for (Path path : sourcePath) {
+                scope.addToScope(
+                    JavaSourceAnalysisScope.SOURCE, new SourceDirectoryTreeModule(path.toFile()));
+              }
+
+              ClassLoaderFactory factory = new ECJClassLoaderFactory(scope.getExclusions());
+              vcha = VersionedClassHierarchyFactory.make(scope, factory);
+              AnalysisOptions options = new AnalysisOptions();
+              Iterable<? extends Entrypoint> entrypoints =
+                  com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(
+                      scope.getApplicationLoader(), vcha);
+              options.setEntrypoints(entrypoints);
+              options.setReflectionOptions(ReflectionOptions.NONE);
+              IAnalysisCacheView cache = new AnalysisCacheImpl(AstIRFactory.makeDefaultFactory());
+              builder =
+                  (SSAPropagationCallGraphBuilder)
+                      new ZeroCFABuilderFactory().make(options, cache, vcha, scope);
+              builder.makeCallGraph(options);
+              cg = builder.getCallGraph();
+            } catch (IllegalArgumentException | CancelException | IOException e) {
+              throw new RuntimeException(e);
+            }
+          }
+        };
 
     magpieServer.addAnalysis(language, analysis);
-
   }
 }

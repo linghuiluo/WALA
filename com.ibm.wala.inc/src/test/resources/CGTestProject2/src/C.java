@@ -1,7 +1,5 @@
-
 public class C extends A {
-  public C() {
-  }
+  public C() {}
 
   public void foo() {
     x = 3;

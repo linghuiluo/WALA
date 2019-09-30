@@ -1,4 +1,3 @@
-
 public class A {
 
   public int x;
@@ -10,5 +9,4 @@ public class A {
   public void foo() {
     x = 1;
   }
-
 }

@@ -2536,11 +2536,6 @@ public abstract class SSAPropagationCallGraphBuilder extends PropagationCallGrap
 
   @SuppressWarnings("unused")
   public void adaptIncrements(List<Change> changes) {
-    for(Change c:changes)
-    {
-      
-    }
+    for (Change c : changes) {}
   }
-  
-  
 }

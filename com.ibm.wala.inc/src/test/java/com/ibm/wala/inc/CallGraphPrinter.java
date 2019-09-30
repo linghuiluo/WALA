@@ -7,7 +7,6 @@ import com.ibm.wala.util.WalaException;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.viz.DotUtil;
 import com.ibm.wala.viz.NodeDecorator;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,10 +36,9 @@ public class CallGraphPrinter {
       String dotFile = fileName + ".dot";
       String pdfFile = fileName = fileName + ".pdf";
       DotUtil.writeDotFile(cg, labels, fileName, dotFile);
-      Runtime.getRuntime().exec(new String[] { "dot", "-Tpdf", dotFile, "-o", pdfFile });
+      Runtime.getRuntime().exec(new String[] {"dot", "-Tpdf", dotFile, "-o", pdfFile});
     } catch (WalaException | IOException e) {
       throw new RuntimeException(e);
     }
   }
-
 }
