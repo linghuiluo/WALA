@@ -49,7 +49,7 @@ public class CallGraphTest {
 
       // add source code to scope
       String dir = System.getProperty("user.dir");
-      String projectDir1 = dir + "/src/test/resources/CGTestProject1/src";
+      String projectDir1 = dir + "/testdata/CGTestProject1/src";
       ClassLoaderReference classLoader = JavaSourceAnalysisScope.SOURCE;
       scope.addToScope(classLoader, new SourceDirectoryTreeModule(new File(projectDir1)));
 
