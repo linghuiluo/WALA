@@ -1,5 +1,6 @@
 package com.ibm.wala.inc;
 
+import com.ibm.wala.cast.java.translator.SourceModuleTranslator;
 import com.ibm.wala.cast.java.translator.jdt.ecj.ECJSourceLoaderImpl;
 import com.ibm.wala.cast.tree.CAstSourcePositionMap.Position;
 import com.ibm.wala.classLoader.IClass;
@@ -32,6 +33,10 @@ public class IncSourceLoaderImpl extends ECJSourceLoaderImpl {
     return null;
   }
 
+  @Override
+	protected SourceModuleTranslator getTranslator() {
+	  return new IncSourceModuleTranslator(cha.getScope(),this);
+	}
   @Override
   public void init(List<Module> modules) throws IOException {
     super.init(modules);
