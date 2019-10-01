@@ -30,86 +30,88 @@ import org.junit.Test;
 
 public class CallGraphTest {
 
-  AnalysisOptions options;
-  IAnalysisCacheView cache;
-  ClassHierarchy cha;
-  AnalysisScope scope;
-  SSAPropagationCallGraphBuilder cgBuilder;
+	AnalysisOptions options;
+	IAnalysisCacheView cache;
+	ClassHierarchy cha;
+	AnalysisScope scope;
+	SSAPropagationCallGraphBuilder cgBuilder;
 
-  @Before
-  public void pre() {
-    try {
-      scope = new JavaSourceAnalysisScope();
+	@Test
+	public void createAllCallgraphs()
+	{
+		testZeroCFA("CGTestProject1");
+		testZeroCFA("CGTestProject2");
+		testZeroCFA("CGTestProject3");
+	}
+	
+	public void buildCHA(String projectName) {
+		try {
+			scope = new JavaSourceAnalysisScope();
 
-      // add standard libraries to scope
-      String[] stdlibs = WalaProperties.getJ2SEJarFiles();
-      for (String stdlib : stdlibs) {
-        scope.addToScope(ClassLoaderReference.Primordial, new JarFile(stdlib));
-      }
+			// add standard libraries to scope
+			String[] stdlibs = WalaProperties.getJ2SEJarFiles();
+			for (String stdlib : stdlibs) {
+				scope.addToScope(ClassLoaderReference.Primordial, new JarFile(stdlib));
+			}
 
-      // add source code to scope
-      String dir = System.getProperty("user.dir");
-      String projectDir1 = dir + "/testdata/CGTestProject1/src";
-      ClassLoaderReference classLoader = JavaSourceAnalysisScope.SOURCE;
-      scope.addToScope(classLoader, new SourceDirectoryTreeModule(new File(projectDir1)));
+			// add source code to scope
+			String dir = System.getProperty("user.dir");
+			String projectDir = dir + "/testdata/" + projectName + "/src";
+			ClassLoaderReference classLoader = JavaSourceAnalysisScope.SOURCE;
+			scope.addToScope(classLoader, new SourceDirectoryTreeModule(new File(projectDir)));
 
-      // construct cha
-      ClassLoaderFactory factory = new ECJClassLoaderFactory(scope.getExclusions());
-      cha = ClassHierarchyFactory.make(scope, factory);
+			// construct cha
+			ClassLoaderFactory factory = new ECJClassLoaderFactory(scope.getExclusions());
+			cha = ClassHierarchyFactory.make(scope, factory);
 
-      // compute entry points
-      Iterable<? extends Entrypoint> entrypoints =
-          com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(classLoader, cha);
+			// compute entry points
+			Iterable<? extends Entrypoint> entrypoints = com.ibm.wala.ipa.callgraph.impl.Util
+					.makeMainEntrypoints(classLoader, cha);
 
-      options = new AnalysisOptions();
-      options.setEntrypoints(entrypoints);
-      options.setReflectionOptions(ReflectionOptions.NONE);
+			options = new AnalysisOptions();
+			options.setEntrypoints(entrypoints);
+			options.setReflectionOptions(ReflectionOptions.NONE);
 
-      cache = new AnalysisCacheImpl(AstIRFactory.makeDefaultFactory());
-    } catch (ClassHierarchyException | IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
+			cache = new AnalysisCacheImpl(AstIRFactory.makeDefaultFactory());
+		} catch (ClassHierarchyException | IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	// dot -Tpdf 0CFA_callgraph.dot -o 0CFA_callgraph.pdf
+	public void testZeroCFA(String projectName ) {
+		try {
+			buildCHA(projectName);
+			cgBuilder = (SSAPropagationCallGraphBuilder) new ZeroCFABuilderFactory().make(options, cache, cha, scope);
+			CallGraph cg = cgBuilder.makeCallGraph(options);
+			CallGraphPrinter.print(projectName+"_0CFA", cg, true);
+		} catch (IllegalArgumentException | CancelException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-  // dot -Tpdf 0CFA_callgraph.dot -o 0CFA_callgraph.pdf
+	public void testZeroOneContainerCFA(String projectName ) {
+		try {
+			buildCHA(projectName);
+			// this cg builder considers context-sensitivity for java util collections
+			cgBuilder = (SSAPropagationCallGraphBuilder) new ZeroOneContainerCFABuilderFactory().make(options, cache,
+					cha, scope);
+			CallGraph cg = cgBuilder.makeCallGraph(options);
+			CallGraphPrinter.print("0-1-container-CFA", cg, true);
 
-  @Test
-  public void testZeroCFA() {
-    try {
-      cgBuilder =
-          (SSAPropagationCallGraphBuilder)
-              new ZeroCFABuilderFactory().make(options, cache, cha, scope);
-      CallGraph cg = cgBuilder.makeCallGraph(options);
-      CallGraphPrinter.print("0CFA", cg, true);
-    } catch (IllegalArgumentException | CancelException e) {
-      throw new RuntimeException(e);
-    }
-  }
+		} catch (IllegalArgumentException | CancelException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-  @Test
-  public void testZeroOneContainerCFA() {
-    try {
-      // context-sensitivity for java util collections
-      cgBuilder =
-          (SSAPropagationCallGraphBuilder)
-              new ZeroOneContainerCFABuilderFactory().make(options, cache, cha, scope);
-      CallGraph cg = cgBuilder.makeCallGraph(options);
-      CallGraphPrinter.print("0-1-container-CFA", cg, true);
-
-    } catch (IllegalArgumentException | CancelException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Test
-  public void testZeroOneCFA() {
-    try {
-      cgBuilder = new ZeroOneCFABuilderFactory().make(options, cache, cha, scope);
-      CallGraph cg = cgBuilder.makeCallGraph(options);
-      CallGraphPrinter.print("0-1-CFA", cg, true);
-
-    } catch (IllegalArgumentException | CancelException e) {
-      throw new RuntimeException(e);
-    }
-  }
+	public void testZeroOneCFA(String projectName ) {
+		try {
+			buildCHA(projectName);
+			cgBuilder = new ZeroOneCFABuilderFactory().make(options, cache, cha, scope);
+			CallGraph cg = cgBuilder.makeCallGraph(options);
+			CallGraphPrinter.print("0-1-CFA", cg, true);
+		} catch (IllegalArgumentException | CancelException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
