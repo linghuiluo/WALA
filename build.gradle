@@ -15,6 +15,7 @@ plugins {
 	id 'de.undercouch.download'
 	id 'nebula.lint' version '13.0.0'
 	id 'nebula.source-jar' version '9.5.0' apply false
+	id 'maven-publish'
 }
 
 repositories {
@@ -79,6 +80,7 @@ subprojects { subproject ->
 	apply plugin: 'eclipse'
 	apply plugin: 'java-library'
 	apply plugin: 'nebula.source-jar'
+	apply plugin: 'maven-publish'
 
 	version rootProject.version
 
@@ -90,6 +92,25 @@ subprojects { subproject ->
 	}
 
 	jar.manifest.from('META-INF/MANIFEST.MF')
+
+
+	publishing{
+		publications {
+			mavenJava(MavenPublication) {
+				from components.java
+			}
+		}
+		repositories{
+			maven{
+				name 'wala'
+				url walaDeployerRepo
+				credentials {
+					username = walaDeployerName
+					password = walaDeployerPassword
+				}
+			}
+		}
+	}
 
 	eclipse {
 		synchronizationTasks 'processTestResources'
