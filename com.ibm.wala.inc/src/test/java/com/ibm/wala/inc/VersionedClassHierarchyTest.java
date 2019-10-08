@@ -47,17 +47,23 @@ import org.junit.Test;
 
 public class VersionedClassHierarchyTest {
 
-	AnalysisScope scope;
+	IncJavaSourceAnalysisScope scope;
 	VersionedClassHierarchy vcha;
 	ClassLoaderFactory factory;
 
 	@Test
 	public void testIncLoading() {
 		initialLoad();
+		buildCallGraph("First");
+		System.out.println();
 		incLoad1();
+		buildCallGraph("Second");
+		System.out.println();
 		incLoad2();
+		buildCallGraph("Third");
+		System.out.println();
 	}
-	
+
 	public void initialLoad() {
 		try {
 			File projectSourcePath = new File(System.getProperty("user.dir") + "/testdata/CGTestProject1/src");
@@ -75,64 +81,54 @@ public class VersionedClassHierarchyTest {
 			factory = new IncSourceLoaderFactory(scope.getExclusions());
 			vcha = VersionedClassHierarchyFactory.make(null, scope, factory);
 			System.out.println("VCHA Version: " + vcha.latestVersion);
-			Iterator<IClass> it = vcha.getLoader(IncJavaSourceAnalysisScope.SOURCE).iterateAllClasses();
-			while (it.hasNext()) {
-				IClass c = it.next();
-				if (c instanceof JavaClass)
-					System.out.println(c.getName());
-			}
-
 		} catch (IllegalArgumentException | IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-
 	public void incLoad1() {
+		File projectSourcePath = new File(System.getProperty("user.dir") + "/testdata/CGTestProject2/src");
+		scope.resetModules(IncJavaSourceAnalysisScope.SOURCE);
+		scope.addToScope(IncJavaSourceAnalysisScope.SOURCE, new SourceDirectoryTreeModule(projectSourcePath));
 		File fileA = new File(System.getProperty("user.dir") + "/testdata/CGTestProject2/src/A.java");
 		File fileC = new File(System.getProperty("user.dir") + "/testdata/CGTestProject2/src/C.java");
 		File fileMain = new File(System.getProperty("user.dir") + "/testdata/CGTestProject2/src/Main.java");
 		scope.addSourceFileToScope(IncJavaSourceAnalysisScope.INCREMENTAL, fileA, "A");
 		scope.addSourceFileToScope(IncJavaSourceAnalysisScope.INCREMENTAL, fileC, "C");
 		scope.addSourceFileToScope(IncJavaSourceAnalysisScope.INCREMENTAL, fileMain, "Main");
-		factory = new IncSourceLoaderFactory(scope.getExclusions());
 		vcha = VersionedClassHierarchyFactory.make(vcha, scope, factory);
 		System.out.println("VCHA Version: " + vcha.getVersion());
-		
-		IClassLoader loader = vcha.getLoader(IncJavaSourceAnalysisScope.INCREMENTAL);
-		Iterator<IClass> it = loader.iterateAllClasses();
-		while (it.hasNext()) {
-			IClass c = it.next();
-			if (c instanceof JavaClass)
-				System.out.println(c.getName());
-		}
-
-		IClass c = loader.lookupClass(TypeName.findOrCreate("LA"));
-		if (c instanceof JavaClass)
-			System.out.println(c.getName());
 	}
 
-	public void incLoad2()
-	{
+	public void incLoad2() {
+		File projectSourcePath = new File(System.getProperty("user.dir") + "/testdata/CGTestProject3/src");
+		scope.resetModules(IncJavaSourceAnalysisScope.SOURCE);
+		scope.addToScope(IncJavaSourceAnalysisScope.SOURCE, new SourceDirectoryTreeModule(projectSourcePath));;
 		File fileA = new File(System.getProperty("user.dir") + "/testdata/CGTestProject3/src/A.java");
 		File fileMain = new File(System.getProperty("user.dir") + "/testdata/CGTestProject3/src/Main.java");
 		scope.addSourceFileToScope(IncJavaSourceAnalysisScope.INCREMENTAL, fileA, "A");
 		scope.addSourceFileToScope(IncJavaSourceAnalysisScope.INCREMENTAL, fileMain, "Main");
-		factory = new IncSourceLoaderFactory(scope.getExclusions());
 		vcha = VersionedClassHierarchyFactory.make(vcha, scope, factory);
-		System.out.println("VCHA Version: " + vcha.getVersion());
+		System.out.println("VCHA Version: " + vcha.getVersion());	
 		
-		IClassLoader loader = vcha.getLoader(IncJavaSourceAnalysisScope.INCREMENTAL);
-		Iterator<IClass> it = loader.iterateAllClasses();
-		while (it.hasNext()) {
-			IClass c = it.next();
-			if (c instanceof JavaClass)
-				System.out.println(c.getName());
+	}
+
+	public void buildCallGraph(String name) {
+		// compute entry points
+		Iterable<? extends Entrypoint> entrypoints = Util
+				.makeMainEntrypointsFromIncSourceLoader(IncJavaSourceAnalysisScope.INCREMENTAL, vcha);
+		AnalysisOptions options = new AnalysisOptions();
+		options.setEntrypoints(entrypoints);
+		options.setReflectionOptions(ReflectionOptions.NONE);
+		IAnalysisCacheView cache = new AnalysisCacheImpl(AstIRFactory.makeDefaultFactory());
+		SSAPropagationCallGraphBuilder cgBuilder = (SSAPropagationCallGraphBuilder) new ZeroCFABuilderFactory()
+				.make(options, cache, vcha, scope);
+		try {
+			CallGraph cg = cgBuilder.makeCallGraph(options);
+			CallGraphPrinter.print(name + "_0CFA", cg, true);
+		} catch (IllegalArgumentException | CancelException e) {
+			throw new RuntimeException(e);
 		}
 
-		IClass c = loader.lookupClass(TypeName.findOrCreate("LA"));
-		if (c instanceof JavaClass)
-			System.out.println(c.getName());
 	}
-	
 }
