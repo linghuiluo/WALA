@@ -9,14 +9,12 @@ public class A {
   public void foo() {
     x = 1;
   }
-  
-  public void secondFoo()
-  {
-	x = 2; 
+
+  public void secondFoo() {
+    x = 2;
   }
-  
-  public void thirdFoo()
-  {
-	x = 3;
+
+  public void thirdFoo() {
+    x = 3;
   }
 }

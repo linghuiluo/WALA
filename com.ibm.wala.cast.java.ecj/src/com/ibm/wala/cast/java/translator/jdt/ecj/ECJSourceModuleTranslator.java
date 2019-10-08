@@ -174,7 +174,7 @@ public class ECJSourceModuleTranslator implements SourceModuleTranslator {
 
   @Override
   public void loadAllSources(Set<ModuleEntry> modules) {
-	
+
     List<String> sources = new LinkedList<>();
     Map<String, ModuleEntry> sourceMap = HashMapFactory.make();
     for (ModuleEntry m : modules) {
@@ -193,9 +193,8 @@ public class ECJSourceModuleTranslator implements SourceModuleTranslator {
     Hashtable<String, String> options = JavaCore.getOptions();
     options.put(JavaCore.COMPILER_SOURCE, "1.8");
     parser.setCompilerOptions(options);
-    System.err.println("create AST for ");
-    for(String f:sourceFiles)
-    	System.err.println(f);
+    System.err.println("ECJSourceModuleTranslator - create AST for: ");
+    for (String f : sourceFiles) System.err.println(f);
     parser.createASTs(
         sourceFiles, null, new String[0], new ECJAstToIR(sourceMap), new NullProgressMonitor());
   }

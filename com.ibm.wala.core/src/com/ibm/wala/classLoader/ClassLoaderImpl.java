@@ -107,7 +107,7 @@ public class ClassLoaderImpl implements IClassLoader {
    * @return the Set of source files in the module
    */
   @SuppressWarnings("unused")
-  private Set<ModuleEntry> getSourceFiles(Module M) throws IOException {
+  protected Set<ModuleEntry> getSourceFiles(Module M) throws IOException {
     if (DEBUG_LEVEL > 0) {
       System.err.println("Get source files for " + M);
     }
