@@ -28,10 +28,9 @@ public class IncSourceLoaderFactory extends ECJClassLoaderFactory {
       IClassLoader parent,
       AnalysisScope scope)
       throws IOException {
-    if (classLoaderReference.equals(IncJavaSourceAnalysisScope.INCREMENTAL)) {
+    if (classLoaderReference.getName().toString().startsWith("Incremental")) {
       ClassLoaderImpl cl = makeIncClassLoader(classLoaderReference, cha, parent);
-      // load all source files
-      cl.init(scope.getModules(classLoaderReference));
+      this.loaders.put(classLoaderReference, cl);
       return cl;
     } else {
       if (this.loaders.containsKey(classLoaderReference)) {
@@ -48,7 +47,7 @@ public class IncSourceLoaderFactory extends ECJClassLoaderFactory {
   public IClassLoader getLoader(
       ClassLoaderReference classLoaderReference, IClassHierarchy cha, AnalysisScope scope)
       throws IOException {
-    if (classLoaderReference.equals(IncJavaSourceAnalysisScope.INCREMENTAL)) {
+    if (classLoaderReference.getName().toString().startsWith("Incremental")) {
       ClassLoaderReference parentRef = classLoaderReference.getParent();
       IClassLoader parent = null;
       if (parentRef != null) {
@@ -60,6 +59,6 @@ public class IncSourceLoaderFactory extends ECJClassLoaderFactory {
 
   protected ClassLoaderImpl makeIncClassLoader(
       ClassLoaderReference classLoaderReference, IClassHierarchy cha, IClassLoader parent) {
-    return new IncSourceLoaderImpl(classLoaderReference, parent, cha);
+    return new IncSourceLoader(classLoaderReference, parent, cha);
   }
 }

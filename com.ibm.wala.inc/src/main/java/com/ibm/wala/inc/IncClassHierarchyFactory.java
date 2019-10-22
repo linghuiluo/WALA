@@ -1,17 +1,16 @@
 package com.ibm.wala.inc;
 
 import com.ibm.wala.classLoader.ClassLoaderFactory;
-import com.ibm.wala.ipa.callgraph.AnalysisScope;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** @author Linghui Luo */
-public class VersionedClassHierarchyFactory extends ClassHierarchyFactory {
+public class IncClassHierarchyFactory extends ClassHierarchyFactory {
 
-  public static VersionedClassHierarchy make(
-      VersionedClassHierarchy previous, AnalysisScope scope, ClassLoaderFactory factory) {
+  public static IncClassHierarchy make(
+      IncClassHierarchy previous, IncJavaSourceAnalysisScope scope, ClassLoaderFactory factory) {
     if (scope == null) {
       throw new IllegalArgumentException("null scope");
     }
@@ -19,8 +18,7 @@ public class VersionedClassHierarchyFactory extends ClassHierarchyFactory {
       throw new IllegalArgumentException("null factory");
     }
     try {
-      return new VersionedClassHierarchy(
-          previous,
+      return new IncClassHierarchy(
           scope,
           factory,
           scope.getLanguages(),

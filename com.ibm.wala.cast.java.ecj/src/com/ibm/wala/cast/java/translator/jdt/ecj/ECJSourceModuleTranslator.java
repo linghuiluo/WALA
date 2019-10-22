@@ -60,6 +60,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -111,8 +112,8 @@ public class ECJSourceModuleTranslator implements SourceModuleTranslator {
 
   protected boolean dump;
   protected ECJSourceLoaderImpl sourceLoader;
-  private final String[] sources;
-  private final String[] libs;
+  protected Set<String> sources;
+  private final Set<String> libs;
   private final SetOfClasses exclusions;
 
   public ECJSourceModuleTranslator(AnalysisScope scope, ECJSourceLoaderImpl sourceLoader) {
@@ -124,16 +125,16 @@ public class ECJSourceModuleTranslator implements SourceModuleTranslator {
     this.sourceLoader = sourceLoader;
     this.dump = dump;
 
-    Pair<String[], String[]> paths = computeClassPath(scope);
+    Pair<Set<String>, Set<String>> paths = computeClassPath(scope);
     sources = paths.fst;
     libs = paths.snd;
 
     this.exclusions = scope.getExclusions();
   }
 
-  private static Pair<String[], String[]> computeClassPath(AnalysisScope scope) {
-    List<String> sources = new LinkedList<>();
-    List<String> libs = new LinkedList<>();
+  private static Pair<Set<String>, Set<String>> computeClassPath(AnalysisScope scope) {
+    Set<String> sources = new HashSet<>();
+    Set<String> libs = new HashSet<>();
     for (ClassLoaderReference cl : scope.getLoaders()) {
 
       while (cl != null) {
@@ -157,15 +158,20 @@ public class ECJSourceModuleTranslator implements SourceModuleTranslator {
             DirectoryTreeModule directoryTreeModule = (DirectoryTreeModule) m;
 
             sources.add(directoryTreeModule.getPath());
+          } else if (m instanceof SourceFileModule) {
+
+            SourceFileModule sourceFileModule = (SourceFileModule) m;
+            sources.add(sourceFileModule.getFile().getParent());
           } else {
             // Assertions.UNREACHABLE("Module entry is neither jar file nor directory");
+
           }
         }
         cl = cl.getParent();
       }
     }
 
-    return Pair.make(sources.toArray(new String[0]), libs.toArray(new String[0]));
+    return Pair.make(sources, libs);
   }
 
   /*
@@ -189,7 +195,8 @@ public class ECJSourceModuleTranslator implements SourceModuleTranslator {
     @SuppressWarnings("deprecation")
     final ASTParser parser = ASTParser.newParser(AST.JLS8);
     parser.setResolveBindings(true);
-    parser.setEnvironment(libs, this.sources, null, false);
+    parser.setEnvironment(
+        this.libs.toArray(new String[0]), this.sources.toArray(new String[0]), null, false);
     Hashtable<String, String> options = JavaCore.getOptions();
     options.put(JavaCore.COMPILER_SOURCE, "1.8");
     parser.setCompilerOptions(options);

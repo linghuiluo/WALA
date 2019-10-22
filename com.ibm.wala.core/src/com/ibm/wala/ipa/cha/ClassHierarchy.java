@@ -88,7 +88,10 @@ public class ClassHierarchy implements IClassHierarchy {
    * ConcurrentModificationException}. But with a {@link ConcurrentHashMap}, at least the code
    * merrily chugs along, tolerating the race.
    */
-  private final Map<TypeReference, Node> map;
+  protected final Map<TypeReference, Node> map;
+
+  protected Map<TypeName, Node> nameMap;
+
   /** {@link TypeReference} for the root type */
   private TypeReference rootTypeRef;
 
@@ -216,6 +219,7 @@ public class ClassHierarchy implements IClassHierarchy {
     Warnings.clear();
 
     this.map = map;
+
     this.superClassHandling = superClassHandling;
 
     if (factory == null) {
@@ -702,6 +706,14 @@ public class ClassHierarchy implements IClassHierarchy {
     if (result == null) {
       result = new Node(klass);
       map.put(klass.getReference(), result);
+      if (nameMap == null) {
+        nameMap = new HashMap<>();
+        map.forEach(
+            (key, value) -> {
+              nameMap.put(key.getName(), value);
+            });
+      }
+      nameMap.put(klass.getReference().getName(), result);
     }
     return result;
   }
@@ -758,7 +770,7 @@ public class ClassHierarchy implements IClassHierarchy {
 
     private int right = -1;
 
-    Node(IClass klass) {
+    public Node(IClass klass) {
       this.klass = klass;
     }
 
@@ -766,7 +778,7 @@ public class ClassHierarchy implements IClassHierarchy {
       return klass.isInterface();
     }
 
-    IClass getJavaClass() {
+    public IClass getJavaClass() {
       return klass;
     }
 

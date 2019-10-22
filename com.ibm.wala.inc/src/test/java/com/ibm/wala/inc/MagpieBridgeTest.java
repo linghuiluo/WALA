@@ -17,7 +17,6 @@ import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.callgraph.IAnalysisCacheView;
 import com.ibm.wala.ipa.callgraph.propagation.Change;
 import com.ibm.wala.ipa.callgraph.propagation.SSAPropagationCallGraphBuilder;
-import com.ibm.wala.ipa.cha.CancelCHAConstructionException;
 import com.ibm.wala.properties.WalaProperties;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.util.CancelException;
@@ -47,7 +46,7 @@ public class MagpieBridgeTest {
     magpieServer.addProjectService(language, ps);
     ServerAnalysis analysis =
         new ServerAnalysis() {
-          VersionedClassHierarchy vcha;
+          IncClassHierarchy vcha;
           SSAPropagationCallGraphBuilder builder;
           CallGraph cg;
 
@@ -57,7 +56,7 @@ public class MagpieBridgeTest {
           }
 
           @Override
-          public void analyze(Collection<Module> files, MagpieServer server) {
+          public void analyze(Collection<Module> files, MagpieServer server, boolean rerun) {
 
             //
 
@@ -68,18 +67,13 @@ public class MagpieBridgeTest {
 
             //
 
-            IncSourceLoaderImpl incLoader =
-                new IncSourceLoaderImpl(
-                    IncJavaSourceAnalysisScope.INCREMENTAL,
-                    vcha.getLoader(ClassLoaderReference.Application),
-                    vcha);
-
+            IncSourceLoader incLoader = null;
             try {
               incLoader.init(new ArrayList<>(files));
 
               List<Change> changes = incLoader.getChanges(ranges);
 
-              vcha.addLatestIncrement(incLoader);
+              // vcha.addLatestIncrement(incLoader);
 
               builder.adaptIncrements(changes);
 
@@ -88,13 +82,12 @@ public class MagpieBridgeTest {
               Collection<AnalysisResult> results = Collections.emptyList();
               server.consume(results, source());
 
-            } catch (CancelCHAConstructionException | IOException e) {
+            } catch (IOException e) {
 
               throw new RuntimeException(e);
             }
           }
 
-          @Override
           public void prepare(IProjectService ps) {
             try {
               AnalysisScope scope = new JavaSourceAnalysisScope();
@@ -117,7 +110,7 @@ public class MagpieBridgeTest {
               }
 
               ClassLoaderFactory factory = new ECJClassLoaderFactory(scope.getExclusions());
-              vcha = VersionedClassHierarchyFactory.make(null, scope, factory);
+              // vcha = IncClassHierarchyFactory.make(null, scope, factory);
               AnalysisOptions options = new AnalysisOptions();
               Iterable<? extends Entrypoint> entrypoints =
                   com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(

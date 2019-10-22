@@ -664,13 +664,17 @@ public abstract class JavaSourceLoaderImpl extends ClassLoaderImpl {
             (owner != null) ? (JavaClass) fTypeMap.get(owner) : (JavaClass) null,
             getAnnotations(type));
 
-    if (getParent().lookupClass(javaClass.getName()) != null) {
+    if (shouldIgnore(javaClass)) {
       return null;
     }
 
     fTypeMap.put(type, javaClass);
     loadedClasses.put(javaClass.getName(), javaClass);
     return javaClass;
+  }
+
+  protected boolean shouldIgnore(JavaClass javaClass) {
+    return getParent().lookupClass(javaClass.getName()) != null;
   }
 
   @Override
