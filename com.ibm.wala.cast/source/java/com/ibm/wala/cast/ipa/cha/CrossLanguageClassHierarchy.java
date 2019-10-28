@@ -24,11 +24,13 @@ import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.FieldReference;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.Selector;
+import com.ibm.wala.types.TypeName;
 import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.util.collections.ComposedIterator;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.debug.Assertions;
+import com.ibm.wala.util.debug.UnimplementedError;
 import com.ibm.wala.util.strings.Atom;
 import java.util.Collection;
 import java.util.Iterator;
@@ -278,4 +280,9 @@ public class CrossLanguageClassHierarchy implements IClassHierarchy {
     return HashSetFactory.make();
   }
   /* END Custom change: unresolved classes */
+
+  @Override
+  public IClass lookupClass(TypeName name) {
+    throw new UnimplementedError();
+  }
 }

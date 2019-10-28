@@ -70,7 +70,7 @@ public class ClassLoaderImpl implements IClassLoader {
   protected final IClassHierarchy cha;
 
   /** an object to delegate to for loading of array classes */
-  private final ArrayClassLoader arrayClassLoader;
+  protected final ArrayClassLoader arrayClassLoader;
 
   /**
    * @param loader class loader reference identifying this loader

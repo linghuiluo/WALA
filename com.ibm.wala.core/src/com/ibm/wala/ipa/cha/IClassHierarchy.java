@@ -20,6 +20,7 @@ import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.FieldReference;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.Selector;
+import com.ibm.wala.types.TypeName;
 import com.ibm.wala.types.TypeReference;
 import java.util.Collection;
 import java.util.Set;
@@ -175,4 +176,6 @@ public interface IClassHierarchy extends Iterable<IClass> {
    * @throws IllegalArgumentException if c2 is null
    */
   public boolean isAssignableFrom(IClass c1, IClass c2);
+
+  public IClass lookupClass(TypeName name);
 }

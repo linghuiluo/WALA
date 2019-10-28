@@ -12,14 +12,14 @@ public class IncJavaSourceAnalysisScope extends JavaSourceAnalysisScope {
     super();
   }
 
-  public ClassLoaderReference createIncLoaderReference() {
+  public ClassLoaderReference createIncLoaderReference(ClassLoaderReference parent) {
     count++;
     String loaderName = "Incremental" + count;
     ClassLoaderReference loaderRef =
         new ClassLoaderReference(
             Atom.findOrCreateUnicodeAtom(loaderName),
             Atom.findOrCreateAsciiAtom("Java"),
-            JavaSourceAnalysisScope.SOURCE);
+            parent);
     loadersByName.put(loaderRef.getName(), loaderRef);
     return loaderRef;
   }

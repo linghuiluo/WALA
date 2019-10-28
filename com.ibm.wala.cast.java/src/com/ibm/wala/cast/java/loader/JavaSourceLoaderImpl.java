@@ -133,7 +133,7 @@ public abstract class JavaSourceLoaderImpl extends ClassLoaderImpl {
     public IClass getSuperclass() {
       boolean excludedSupertype = false;
       for (TypeName name : superTypeNames) {
-        IClass domoType = lookupClass(name);
+        IClass domoType = cha.lookupClass(name);
         if (domoType != null && !domoType.isInterface()) {
           return domoType;
         }
@@ -173,7 +173,7 @@ public abstract class JavaSourceLoaderImpl extends ClassLoaderImpl {
     public Collection<IClass> getDirectInterfaces() {
       List<IClass> result = new ArrayList<>();
       for (TypeName name : superTypeNames) {
-        IClass domoType = lookupClass(name);
+        IClass domoType = cha.lookupClass(name);
         if (domoType != null && domoType.isInterface()) {
           result.add(domoType);
         }
@@ -513,7 +513,7 @@ public abstract class JavaSourceLoaderImpl extends ClassLoaderImpl {
         int lastLeftParen = parents[i].lastIndexOf('(');
         int lastQ = parents[i].lastIndexOf('/', lastLeftParen);
         String typeName = parents[i].substring(0, lastQ);
-        final IClass cls = lookupClass(TypeName.string2TypeName(typeName));
+        final IClass cls = this.getClassHierarchy().lookupClass(TypeName.string2TypeName(typeName));
 
         String sig = parents[i].substring(lastQ);
         int nameEnd = sig.indexOf('(');

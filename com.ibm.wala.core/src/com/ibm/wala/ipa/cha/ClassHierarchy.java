@@ -1332,4 +1332,14 @@ public class ClassHierarchy implements IClassHierarchy {
   public MissingSuperClassHandling getSuperClassHandling() {
     return superClassHandling;
   }
+
+  @Override
+  public IClass lookupClass(TypeName name) {
+    Node node = this.nameMap.get(name);
+    if (node != null) {
+      return node.getJavaClass();
+    } else {
+      return null;
+    }
+  }
 }

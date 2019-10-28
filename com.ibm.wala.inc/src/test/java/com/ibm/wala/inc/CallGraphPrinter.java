@@ -14,6 +14,7 @@ import java.util.Iterator;
 public class CallGraphPrinter {
   public static void print(String title, CallGraph cg, boolean simplified) {
     try {
+    	System.err.println("output "+title);
       cg.iterator();
       Iterator<CGNode> cgIt = cg.iterator();
       HashMap<CGNode, String> labelMap = HashMapFactory.make();
