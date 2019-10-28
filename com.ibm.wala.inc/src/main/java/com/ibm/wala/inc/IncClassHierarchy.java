@@ -47,10 +47,12 @@ public class IncClassHierarchy extends ClassHierarchy {
    * @param files
    * @return
    */
-  public IncClassHierarchy update(List<Module> files, ClassLoaderReference parent) {
+  public IncClassHierarchy update(List<Module> files) {
     updateCount++;
     try {
       // create a new incremental class loader
+      ClassLoaderReference parent = this.previousLoader;
+      if (this.previousLoader == null) parent = IncJavaSourceAnalysisScope.SOURCE;
       ClassLoaderReference loaderRef = this.scope.createIncLoaderReference(parent);
       this.previousLoader = loaderRef;
       IClassLoader incloader = this.getFactory().getLoader(loaderRef, this, this.getScope());
@@ -79,13 +81,9 @@ public class IncClassHierarchy extends ClassHierarchy {
     TypeName type = klass.getReference().getName();
     IClass lookup = this.lookupClass(type);
     if (lookup == null) {
-
       this.addClass(klass);
-      System.err.println("ADD class " + klass.getName());
     } else {
-
       this.replaceClass(klass);
-      System.err.println("replace class " + klass.getName());
     }
   }
 
@@ -98,7 +96,6 @@ public class IncClassHierarchy extends ClassHierarchy {
       }
     }
     for (TypeReference t : toRemoved) this.map.remove(t);
-
     this.map.put(klass.getReference(), updatedKlass);
     this.nameMap.put(klass.getReference().getName(), updatedKlass);
   }

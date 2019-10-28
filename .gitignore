@@ -60,3 +60,7 @@ com.ibm.wala.inc/0-1-container-CFA_callgraph.pdf
 com.ibm.wala.inc/0CFA_callgraph.dot
 
 com.ibm.wala.inc/0CFA_callgraph.pdf
+
+*.pdf
+
+*.dot

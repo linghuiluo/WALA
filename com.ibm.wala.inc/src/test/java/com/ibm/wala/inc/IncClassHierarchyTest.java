@@ -80,7 +80,7 @@ public class IncClassHierarchyTest {
     files.add(new SourceFileModule(fileC, "C", null));
     files.add(new SourceFileModule(fileMain, "Main", null));
 
-    icha.update(files, IncJavaSourceAnalysisScope.SOURCE);
+    icha.update(files);
   }
 
   public void incLoad2() {
@@ -92,7 +92,7 @@ public class IncClassHierarchyTest {
     files.add(new SourceFileModule(fileA, "A", null));
     files.add(new SourceFileModule(fileMain, "Main", null));
 
-    icha.update(files, icha.previousLoader);
+    icha.update(files);
   }
 
   public void buildCallGraph(String name) {
@@ -119,7 +119,7 @@ public class IncClassHierarchyTest {
               IClass latest =
                   icha.lookupClass(site.getDeclaredTarget().getDeclaringClass().getName());
               if (latest != null) {
-                // this is the case that a class is updated
+                // this is the case that a class is updated, the old class is removed from icha
                 IMethod m = latest.getMethod(site.getDeclaredTarget().getSelector());
                 return m;
               } else {
