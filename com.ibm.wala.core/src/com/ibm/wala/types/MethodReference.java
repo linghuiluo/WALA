@@ -15,14 +15,11 @@ import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.shrike.ShrikeUtil;
 import com.ibm.wala.util.strings.Atom;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 /** A class to represent the reference in a class file to a method. */
 public final class MethodReference extends MemberReference {
   /** Used to canonicalize MethodReferences a mapping from Key -&gt; MethodReference */
   private static final HashMap<Key, MethodReference> dictionary = HashMapFactory.make();
-  private static HashMap<TypeName, Set<MethodReference>> references=HashMapFactory.make();
 
   public static final Atom newInstanceAtom = Atom.findOrCreateUnicodeAtom("newInstance");
 
@@ -111,17 +108,7 @@ public final class MethodReference extends MemberReference {
     if (val != null) return val;
     val = new MethodReference(key);
     dictionary.put(key, val);
-    if(!references.containsKey(tref.getName()))
-    {
-      references.put(tref.getName(), new HashSet<>());
-    }
-    references.get(tref.getName()).add(val);
     return val;
-  }
-  
-  public static synchronized Set<MethodReference> find(TypeName type)
-  {
-    return references.get(type);
   }
 
   /**

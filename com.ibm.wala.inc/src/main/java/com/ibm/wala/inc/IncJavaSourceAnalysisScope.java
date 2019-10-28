@@ -17,9 +17,7 @@ public class IncJavaSourceAnalysisScope extends JavaSourceAnalysisScope {
     String loaderName = "Incremental" + count;
     ClassLoaderReference loaderRef =
         new ClassLoaderReference(
-            Atom.findOrCreateUnicodeAtom(loaderName),
-            Atom.findOrCreateAsciiAtom("Java"),
-            parent);
+            Atom.findOrCreateUnicodeAtom(loaderName), Atom.findOrCreateAsciiAtom("Java"), parent);
     loadersByName.put(loaderRef.getName(), loaderRef);
     return loaderRef;
   }
